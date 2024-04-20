@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RaniVari Meat</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9f9f9; }
+  .header, .footer { padding: 20px; text-align: center; color: white; }
+  .header { background: #ff6666; }
+  .footer { background: #333; }
+  .products { display: flex; flex-wrap: wrap; justify-content: center; }
+  .product { flex: 0 1 200px; margin: 10px; padding: 10px; text-align: center; border: 1px solid #ccc; background-color: #f0f0f0; }
+  .product img { width: 100%; height: auto; }
+  input[type="number"] { width: 60px; }
+  .button { padding: 10px; cursor: pointer; background: #4CAF50; color: white; border: none; }
+  .details { background-color: #ddd; margin-top: 10px; padding: 10px; }
+  #checkout, #orderDetails { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>RaniVari Meat</h1>
+  <p>We sell fresh meat.</p>
+</div>
+
+<div class="products">
+  <!-- Product 1 -->
+  <div class="product" data-price="15" data-weight="0">
+    <img src="basa-fish.jpg" alt="Basa Fish">
+    <p>$15/kg</p>
+    <input type="number" min="0" value="0" onchange="updateCart(this, 'Basa Fish', 15)">
+  </div>
+  <!-- Add more products similarly -->
+</div>
+
+<div class="details">
+  <span>Total Weight: <span id="totalWeight">0</span> kg</span><br>
+  <span>Total Cost: $<span id="totalCost">0</span></span><br>
+  <span>Discount: $<span id="discount">0</span></span><br>
+  <span>Payable: $<span id="payable">0</span></span>
+</div>
+
+<button onclick="showCheckout()" class="button">Checkout</button>
+
+<div id="checkout">
+  <h2>Checkout Details</h2>
+  Address: <input type="text" id="address"><br>
+  Phone: <input type="text" id="phone"><br>
+  <button onclick="placeOrder()" class="button">Place Order</button>
+</div>
+
+<div id="orderDetails">
+  <h2>Order Confirmed</h2>
+  <p>Thank You for shopping. Your order is confirmed.</p>
+  <div id="billDetails"></div>
+</div>
+
+<div class="footer">
+  <p>© 2023 RaniVari Meat</p>
+</div>
+
+<script>
+let totalWeight = 0;
+let totalCost = 0;
+
+function updateCart(elem, productName, pricePerKg) {
+  let weight = parseFloat(elem.value);
+  let productElem = elem.parentElement;
+  productElem.dataset.weight = weight;
+
+  calculateTotals();
+}
+
+function calculateTotals() {
+  const products = document.querySelectorAll('.product');
+  totalCost = 0;
+  totalWeight = 0;
+  
+  products.forEach(product => {
+    let weight = parseFloat(product.dataset.weight);
+    let pricePerKg = parseFloat(product.dataset.price);
+    totalWeight += weight;
+    totalCost += weight * pricePerKg;
+  });
+
+  let discount = totalWeight > 2 ? totalCost * 0.2 : 0;
+  let payable = totalCost - discount;
+
+  document.getElementById('totalWeight').textContent = totalWeight.toFixed(2);
+  document.getElementById('totalCost').textContent = totalCost.toFixed(2);
+  document.getElementById('discount').textContent = discount.toFixed(2);
+  document.getElementById('payable').textContent = payable.toFixed(2);
+}
+
+function showCheckout() {
+  document.getElementById('checkout').style.display = 'block';
+}
+
+function placeOrder() {
+  let address = document.getElementById('address').value;
+  let phone = document.getElementById('phone').value;
+  
+  if (address === "" || phone === "") {
+    alert('Please fill in both your address and phone number.');
+    return;
+  }
+
+  document.getElementById('checkout').style.display = 'none';
+  document.getElementById('orderDetails').style.display = 'block';
+
+  document.getElementById('billDetails').innerHTML = `
+    <p>Address: ${address}</p>
+    <p>Phone: ${phone}</p>
+    <p>Total weight: ${totalWeight.toFixed(2)} kg</p>
+    <p>Total cost: $${totalCost.toFixed(2)}</p>
+    <p>Discount: -$${(totalCost * 0.2).toFixed(2)}</p>
+    <p>Payable: $${(totalCost - totalCost * 0.2).toFixed(2)}</p>
+  `;
+}
+</script>
+</body>
+</html>
